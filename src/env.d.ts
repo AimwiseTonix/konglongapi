@@ -22,14 +22,12 @@ declare global {
   type PrehistoricLicenseServerStatus = {
     configured?: boolean
     reachable?: boolean
-    url?: string
     message?: string
   }
 
   type PrehistoricAppInfo = {
     version?: string
     packaged?: boolean
-    updateFeed?: string
   }
 
   type PrehistoricUpdateStatus = {

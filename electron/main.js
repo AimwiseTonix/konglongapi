@@ -164,7 +164,7 @@ async function requestLicense(endpoint, payload) {
   if (!licenseServerUrl) {
     return {
       ok: false,
-      message: '还没有配置授权服务器地址。请先部署授权服务，并用 LICENSE_SERVER_URL 指向它。',
+      message: '授权服务暂时不可用。',
     }
   }
 
@@ -254,7 +254,6 @@ async function getLicenseServerStatus() {
     return {
       configured: false,
       reachable: false,
-      url: '',
       message: '未配置授权服务器。软件授权功能需要部署授权服务后才能正式启用。',
     }
   }
@@ -271,14 +270,12 @@ async function getLicenseServerStatus() {
     return {
       configured: true,
       reachable: response.ok,
-      url: licenseServerUrl,
       message: response.ok ? '授权服务器连接正常。' : `授权服务器返回 ${response.status}。`,
     }
   } catch (error) {
     return {
       configured: true,
       reachable: false,
-      url: licenseServerUrl,
       message: error instanceof Error ? error.message : '授权服务器连接失败。',
     }
   } finally {
@@ -290,7 +287,6 @@ function getAppInfo() {
   return {
     version: app.getVersion(),
     packaged: app.isPackaged,
-    updateFeed: 'https://tonixx.aimwise.cn/jushou-writer/',
   }
 }
 

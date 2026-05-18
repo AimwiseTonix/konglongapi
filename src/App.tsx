@@ -40,9 +40,8 @@ const DEFAULT_LICENSE: LicenseState = {
   message: '',
 }
 const DEFAULT_APP_STATE: AppState = {
-  version: '0.1.1',
+  version: '0.1.3',
   packaged: false,
-  updateFeed: 'https://tonixx.aimwise.cn/jushou-writer/',
 }
 const DEFAULT_UPDATE_STATE: UpdateState = {
   checking: false,
@@ -55,7 +54,6 @@ const DEFAULT_UPDATE_STATE: UpdateState = {
 const DEFAULT_LICENSE_SERVER_STATE: LicenseServerState = {
   configured: false,
   reachable: false,
-  url: '',
   message: '',
 }
 
@@ -77,7 +75,6 @@ type LicenseState = {
 type AppState = {
   version: string
   packaged: boolean
-  updateFeed: string
 }
 
 type UpdateState = {
@@ -92,7 +89,6 @@ type UpdateState = {
 type LicenseServerState = {
   configured: boolean
   reachable: boolean
-  url: string
   message: string
 }
 
@@ -267,7 +263,6 @@ function normalizeAppInfo(info?: PrehistoricAppInfo): AppState {
   return {
     version: info?.version || DEFAULT_APP_STATE.version,
     packaged: Boolean(info?.packaged),
-    updateFeed: info?.updateFeed || DEFAULT_APP_STATE.updateFeed,
   }
 }
 
@@ -286,7 +281,6 @@ function normalizeLicenseServerStatus(status?: PrehistoricLicenseServerStatus): 
   return {
     configured: Boolean(status?.configured),
     reachable: Boolean(status?.reachable),
-    url: status?.url || '',
     message: status?.message || '',
   }
 }
@@ -1065,10 +1059,6 @@ export function App() {
 
             <div className="statusRows">
               <div>
-                <span>更新源</span>
-                <strong>{appInfo.updateFeed}</strong>
-              </div>
-              <div>
                 <span>更新状态</span>
                 <strong>{updateStatus.message || '尚未手动检查'}</strong>
               </div>
@@ -1114,10 +1104,6 @@ export function App() {
                       ? '连接正常'
                       : '连接失败'}
                 </strong>
-              </div>
-              <div>
-                <span>服务器地址</span>
-                <strong>{licenseServer.url || '待配置'}</strong>
               </div>
               <div>
                 <span>说明</span>
