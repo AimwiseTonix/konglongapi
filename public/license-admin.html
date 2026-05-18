@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>科普巨兽授权后台</title>
+    <style>
+      :root {
+        color: #f5f7fb;
+        background: #030407;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(circle at 16% 0%, rgba(72, 91, 120, 0.24), transparent 28%),
+          linear-gradient(145deg, #020306 0%, #0b0f16 52%, #050609 100%);
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      main {
+        width: min(980px, calc(100% - 32px));
+        margin: 24px auto;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        background: rgba(8, 11, 17, 0.88);
+        box-shadow: 0 26px 80px rgba(0, 0, 0, 0.42);
+      }
+
+      header,
+      section {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      header p,
+      .hint,
+      .result small {
+        color: #8f99ab;
+        line-height: 1.65;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        color: #aeb7c9;
+        font-size: 13px;
+      }
+
+      label.wide {
+        grid-column: 1 / -1;
+      }
+
+      input {
+        width: 100%;
+        height: 44px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        outline: 0;
+        padding: 0 12px;
+        color: #f7f9fd;
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      input:focus {
+        border-color: rgba(255, 255, 255, 0.32);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      button {
+        min-height: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 0 14px;
+        color: #0b0d12;
+        background: #f5f7fb;
+        cursor: pointer;
+        font-weight: 680;
+      }
+
+      button.secondary {
+        color: #f5f7fb;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.7;
+      }
+
+      .result {
+        display: none;
+        margin-top: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      .result.show {
+        display: block;
+      }
+
+      .licenseKey {
+        margin: 8px 0;
+        color: #ffffff;
+        font-size: clamp(18px, 3vw, 28px);
+        font-weight: 760;
+        overflow-wrap: anywhere;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #dce4f2;
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: #99a4b8;
+        font-weight: 650;
+      }
+
+      td {
+        overflow-wrap: anywhere;
+      }
+
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        display: none;
+        max-width: min(420px, calc(100vw - 36px));
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 8px;
+        padding: 12px 14px;
+        color: #ffffff;
+        background: rgba(16, 20, 29, 0.96);
+      }
+
+      .toast.show {
+        display: block;
+      }
+
+      @media (max-width: 720px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        label.wide {
+          grid-column: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>科普巨兽授权后台</h1>
+        <p>输入客户机器码后生成授权码。授权只解锁软件，不包含用户的模型 API Key。</p>
+      </header>
+
+      <section>
+        <div class="grid">
+          <label class="wide">
+            管理口令
+            <input id="adminToken" type="password" placeholder="Vercel 环境变量 LICENSE_ADMIN_TOKEN" />
+          </label>
+          <label class="wide">
+            客户机器码
+            <input id="machineCode" placeholder="客户在软件设置页复制的机器码，可留空让客户首次激活时绑定" />
+          </label>
+          <label>
+            授权天数
+            <input id="days" type="number" min="0" value="365" />
+          </label>
+          <label>
+            可绑定设备数
+            <input id="machines" type="number" min="1" value="1" />
+          </label>
+          <label class="wide">
+            备注
+            <input id="note" placeholder="客户名、订单号、手机号等，仅后台查看" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="createButton">生成授权码</button>
+          <button id="listButton" class="secondary">刷新授权列表</button>
+        </div>
+
+        <p class="hint">管理口令只保存在当前浏览器 localStorage，不会写进软件安装包。</p>
+
+        <div id="result" class="result">
+          <small>授权码</small>
+          <div id="licenseKey" class="licenseKey"></div>
+          <div class="actions">
+            <button id="copyButton" class="secondary">复制授权码</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <table>
+          <thead>
+            <tr>
+              <th>授权码</th>
+              <th>状态</th>
+              <th>设备</th>
+              <th>到期</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="licenseRows"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      const tokenInput = document.querySelector('#adminToken')
+      const machineInput = document.querySelector('#machineCode')
+      const daysInput = document.querySelector('#days')
+      const machinesInput = document.querySelector('#machines')
+      const noteInput = document.querySelector('#note')
+      const createButton = document.querySelector('#createButton')
+      const listButton = document.querySelector('#listButton')
+      const result = document.querySelector('#result')
+      const licenseKeyEl = document.querySelector('#licenseKey')
+      const copyButton = document.querySelector('#copyButton')
+      const rows = document.querySelector('#licenseRows')
+      const toast = document.querySelector('#toast')
+
+      tokenInput.value = localStorage.getItem('konglong-license-admin-token') || ''
+
+      function showToast(message) {
+        toast.textContent = message
+        toast.classList.add('show')
+        window.setTimeout(() => toast.classList.remove('show'), 2400)
+      }
+
+      async function adminFetch(options = {}) {
+        const token = tokenInput.value.trim()
+
+        if (!token) {
+          throw new Error('请先填写管理口令')
+        }
+
+        localStorage.setItem('konglong-license-admin-token', token)
+
+        const response = await fetch('/api/license/admin', {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            ...(options.headers || {}),
+          },
+        })
+        const data = await response.json().catch(() => ({}))
+
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.message || `请求失败：${response.status}`)
+        }
+
+        return data
+      }
+
+      function renderLicenses(licenses) {
+        rows.innerHTML = ''
+
+        for (const license of licenses) {
+          const tr = document.createElement('tr')
+          tr.innerHTML = `
+            <td>${license.key}</td>
+            <td>${license.status}</td>
+            <td>${(license.machines || []).length}/${license.maxMachines}</td>
+            <td>${license.expiresAt || '永久'}</td>
+            <td>${license.note || ''}</td>
+          `
+          rows.appendChild(tr)
+        }
+      }
+
+      async function refreshList() {
+        const data = await adminFetch({ method: 'GET' })
+        renderLicenses(data.licenses || [])
+      }
+
+      createButton.addEventListener('click', async () => {
+        createButton.disabled = true
+
+        try {
+          const data = await adminFetch({
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'create',
+              machineCode: machineInput.value.trim(),
+              days: Number(daysInput.value || 0),
+              maxMachines: Number(machinesInput.value || 1),
+              note: noteInput.value.trim(),
+            }),
+          })
+          licenseKeyEl.textContent = data.license.key
+          result.classList.add('show')
+          showToast('授权码已生成')
+          await refreshList()
+        } catch (error) {
+          showToast(error.message || '生成失败')
+        } finally {
+          createButton.disabled = false
+        }
+      })
+
+      listButton.addEventListener('click', async () => {
+        listButton.disabled = true
+
+        try {
+          await refreshList()
+          showToast('授权列表已刷新')
+        } catch (error) {
+          showToast(error.message || '刷新失败')
+        } finally {
+          listButton.disabled = false
+        }
+      })
+
+      copyButton.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(licenseKeyEl.textContent)
+        showToast('授权码已复制')
+      })
+    </script>
+  </body>
+</html>

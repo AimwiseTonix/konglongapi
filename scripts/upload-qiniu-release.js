@@ -39,11 +39,7 @@ async function findReleaseFiles() {
       return true
     }
 
-    if (
-      /\.exe$/i.test(file) &&
-      file.startsWith('jushou-writer-') &&
-      !file.startsWith('jushou-writer-portable-')
-    ) {
+    if (/\.exe$/i.test(file) && file.startsWith('jushou-writer-')) {
       return true
     }
 

@@ -61,6 +61,7 @@ export default async function handler(request, response) {
   if (action === 'create') {
     const days = Number(body.days || 0)
     const maxMachines = Math.max(1, Number(body.maxMachines || body.machines || 1) || 1)
+    const machineCode = String(body.machineCode || '').trim()
     const licenseKey = generateLicenseKey()
     const expiresAt =
       days > 0 ? new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString() : ''
@@ -68,7 +69,7 @@ export default async function handler(request, response) {
       status: 'active',
       maxMachines,
       expiresAt,
-      machines: [],
+      machines: machineCode ? [machineCode] : [],
       note: String(body.note || ''),
       createdAt: new Date().toISOString(),
       updatedAt: '',
