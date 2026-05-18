@@ -1,0 +1,91 @@
+{
+  "name": "prehistoric-giants-writer",
+  "private": true,
+  "version": "0.1.1",
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"npm:server\" \"npm:client\"",
+    "client": "vite --host 0.0.0.0",
+    "server": "node server/index.js",
+    "desktop": "npm run build && electron .",
+    "desktop:dev": "concurrently -k \"npm:client\" \"wait-on http://127.0.0.1:5317 && cross-env DESKTOP_DEV=1 electron .\"",
+    "build": "tsc && vite build",
+    "dist:win": "npm run build && electron-builder --win nsis portable --publish never",
+    "dist:win:nsis": "npm run build && electron-builder --win nsis --publish never",
+    "dist:win:portable": "npm run build && electron-builder --win portable",
+    "release:qiniu": "npm run dist:win && node scripts/upload-qiniu-release.js",
+    "upload:qiniu": "node scripts/upload-qiniu-release.js",
+    "upload:qiniu:check": "node scripts/upload-qiniu-release.js --dry-run",
+    "license:demo": "node server/license-server.example.js",
+    "license:create": "node scripts/license-admin.js create",
+    "license:list": "node scripts/license-admin.js list",
+    "license:disable": "node scripts/license-admin.js disable",
+    "license:enable": "node scripts/license-admin.js enable",
+    "license:reset-machines": "node scripts/license-admin.js reset-machines",
+    "license:remote:create": "node scripts/license-remote.js create",
+    "license:remote:list": "node scripts/license-remote.js list",
+    "license:remote:disable": "node scripts/license-remote.js disable",
+    "license:remote:enable": "node scripts/license-remote.js enable",
+    "license:remote:reset-machines": "node scripts/license-remote.js reset-machines",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.38.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "concurrently": "^9.2.1",
+    "electron-updater": "^6.8.3",
+    "express": "^5.2.1",
+    "lucide-react": "^0.561.0",
+    "qiniu": "^7.15.2",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "com.local.prehistoricgiants.writer",
+    "productName": "科普巨兽剧本台",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "electronDist": "node_modules/electron/dist",
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://tonixx.aimwise.cn/jushou-writer/",
+        "publishAutoUpdate": true
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "jushou-writer-portable-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "artifactName": "jushou-writer-${version}-${arch}.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
